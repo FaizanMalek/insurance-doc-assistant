@@ -1,15 +1,14 @@
 """Streamlit chat UI for the Insurance Document Assistant.
-Local:  reads .env (via config).
-Cloud:  reads Streamlit secrets, copied into the environment before config loads.
+Local:  reads .env (via config).  Cloud: reads Streamlit secrets.
 Run:    streamlit run ui/app.py
+Standard top-to-bottom chat; suggested questions live in the sidebar so they are
+always reachable without scrolling.
 """
 import os, sys
 import streamlit as st
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# On Streamlit Cloud there is no .env, so copy any provided secrets into the
-# environment BEFORE importing config (config reads os.environ at import time).
 _KEYS = ["PROVIDER", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_KEY",
          "AZURE_CHAT_DEPLOYMENT", "AZURE_EMBED_DEPLOYMENT",
          "AZURE_SEARCH_ENDPOINT", "AZURE_SEARCH_KEY", "AZURE_SEARCH_INDEX",
@@ -19,13 +18,12 @@ try:
         if k in st.secrets:
             os.environ[k] = str(st.secrets[k])
 except Exception:
-    pass  # no secrets file locally; config falls back to .env
+    pass
 
 from ragcore.rag import answer  # noqa: E402
 
-MAX_QUESTIONS = 25  # per-visitor cap to protect the demo budget
+MAX_QUESTIONS = 25
 
-# (button label, full question sent to the assistant)
 SUGGESTED = [
     ("Change a beneficiary", "How do I change the beneficiary on my policy?"),
     ("Submit a death claim", "What is required to submit a death claim?"),
@@ -34,43 +32,66 @@ SUGGESTED = [
     ("No-medical product", "Do I need a medical exam for the No Medical Life product?"),
 ]
 
-st.set_page_config(page_title="Insurance Document Assistant", page_icon="📄")
-st.title("Insurance Document Assistant")
-st.caption("Ask about the policy and claim documents. Every answer cites its source "
-           "document and page, and it refuses when the documents do not cover the "
-           "question. Built by Faizan Malek over publicly available documents.")
+st.set_page_config(page_title="Insurance Document Assistant", page_icon="📄", layout="centered")
 
-if "history" not in st.session_state:
-    st.session_state.history = []
+if "messages" not in st.session_state:
+    st.session_state.messages = []   # {role, content, sources?}
 if "count" not in st.session_state:
     st.session_state.count = 0
 if "pending" not in st.session_state:
     st.session_state.pending = None
 
-st.write("**Try one of these, or type your own below:**")
-cols = st.columns(len(SUGGESTED))
-for i, (label, q) in enumerate(SUGGESTED):
-    if cols[i].button(label, key=f"s{i}", use_container_width=True):
-        st.session_state.pending = q
+# --- Sidebar: always-visible suggestions ---
+with st.sidebar:
+    st.header("Insurance Document Assistant")
+    st.caption("Answers are grounded in the documents and cite their source. "
+               "Built by Faizan Malek over publicly available documents.")
+    st.write("**Try a question:**")
+    for i, (label, q) in enumerate(SUGGESTED):
+        if st.button(label, key=f"s{i}", use_container_width=True):
+            st.session_state.pending = q
+    st.divider()
+    if st.button("Clear chat", use_container_width=True):
+        st.session_state.messages = []
+        st.session_state.count = 0
+        st.rerun()
+
+st.title("Insurance Document Assistant")
+if not st.session_state.messages:
+    st.caption("Ask a question below, or pick one from the sidebar. Every answer "
+               "cites its source document and page, and refuses when the documents "
+               "do not cover the question.")
+
+def render(m):
+    with st.chat_message(m["role"]):
+        st.markdown(m["content"])
+        if m.get("sources"):
+            with st.expander("Sources"):
+                for s in m["sources"]:
+                    st.markdown(f"**{s['source']} (p.{s['page']})** — {s['content'][:300]}...")
+
+# existing conversation, oldest to newest
+for m in st.session_state.messages:
+    render(m)
 
 typed = st.chat_input("Ask about the documents...")
 question = typed or st.session_state.pending
 st.session_state.pending = None
-
-for role, msg in st.session_state.history:
-    st.chat_message(role).write(msg)
 
 if question:
     if st.session_state.count >= MAX_QUESTIONS:
         st.warning("Demo limit reached for this session. Reload to start over.")
     else:
         st.session_state.count += 1
-        st.chat_message("user").write(question)
-        st.session_state.history.append(("user", question))
-        with st.spinner("Searching the documents..."):
-            res = answer(question)
-        st.chat_message("assistant").write(res["answer"])
-        with st.expander("Sources"):
-            for s in res["sources"]:
-                st.markdown(f"**{s['source']} (p.{s['page']})** — {s['content'][:300]}...")
-        st.session_state.history.append(("assistant", res["answer"]))
+        user_msg = {"role": "user", "content": question}
+        render(user_msg)
+        st.session_state.messages.append(user_msg)
+        with st.chat_message("assistant"):
+            with st.spinner("Searching the documents..."):
+                res = answer(question)
+            st.markdown(res["answer"])
+            with st.expander("Sources"):
+                for s in res["sources"]:
+                    st.markdown(f"**{s['source']} (p.{s['page']})** — {s['content'][:300]}...")
+        st.session_state.messages.append({"role": "assistant", "content": res["answer"],
+                                          "sources": res["sources"]})
