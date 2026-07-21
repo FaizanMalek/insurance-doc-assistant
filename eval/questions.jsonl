@@ -1,0 +1,5 @@
+{"question": "What is the grace period for paying a premium?", "expected": "Describes the number of days allowed after the due date before the policy lapses."}
+{"question": "Is suicide covered in the first two years?", "expected": "Explains the suicide exclusion clause and its time limit."}
+{"question": "How do I name or change a beneficiary?", "expected": "Explains the process for designating or changing a beneficiary."}
+{"question": "What is the best pizza topping?", "expected": "Out of scope. Should refuse: not in the documents."}
+{"question": "Does the policy cover accidental death, and how much?", "expected": "Describes accidental death benefit and any multiplier or amount."}
