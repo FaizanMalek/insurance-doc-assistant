@@ -25,12 +25,13 @@ from ragcore.rag import answer  # noqa: E402
 
 MAX_QUESTIONS = 25  # per-visitor cap to protect the demo budget
 
+# (button label, full question sent to the assistant)
 SUGGESTED = [
-    "How do I change the beneficiary on my policy?",
-    "What is required to submit a death claim?",
-    "What does the waiver of premium benefit cover?",
-    "What riders are available and what do they cover?",
-    "Do I need a medical exam for the No Medical Life product?",
+    ("Change a beneficiary", "How do I change the beneficiary on my policy?"),
+    ("Submit a death claim", "What is required to submit a death claim?"),
+    ("Waiver of premium", "What does the waiver of premium benefit cover?"),
+    ("Available riders", "What riders are available and what do they cover?"),
+    ("No-medical product", "Do I need a medical exam for the No Medical Life product?"),
 ]
 
 st.set_page_config(page_title="Insurance Document Assistant", page_icon="📄")
@@ -48,8 +49,8 @@ if "pending" not in st.session_state:
 
 st.write("**Try one of these, or type your own below:**")
 cols = st.columns(len(SUGGESTED))
-for i, q in enumerate(SUGGESTED):
-    if cols[i].button(q.split("?")[0][:22] + "?", key=f"s{i}"):
+for i, (label, q) in enumerate(SUGGESTED):
+    if cols[i].button(label, key=f"s{i}", use_container_width=True):
         st.session_state.pending = q
 
 typed = st.chat_input("Ask about the documents...")
