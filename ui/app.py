@@ -2,7 +2,7 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streamlit as st
-from app.rag import answer
+from ragcore.rag import answer
 
 st.set_page_config(page_title="Insurance Document Assistant", page_icon="📄")
 st.title("Insurance Document Assistant")

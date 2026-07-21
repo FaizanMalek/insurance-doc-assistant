@@ -1,5 +1,12 @@
-{"question": "What is the grace period for paying a premium?", "expected": "Describes the number of days allowed after the due date before the policy lapses."}
-{"question": "Is suicide covered in the first two years?", "expected": "Explains the suicide exclusion clause and its time limit."}
-{"question": "How do I name or change a beneficiary?", "expected": "Explains the process for designating or changing a beneficiary."}
-{"question": "What is the best pizza topping?", "expected": "Out of scope. Should refuse: not in the documents."}
-{"question": "Does the policy cover accidental death, and how much?", "expected": "Describes accidental death benefit and any multiplier or amount."}
+{"question": "How do I change the beneficiary on my policy?", "expected": "Explains how to change a beneficiary and which form to use."}
+{"question": "What form do I use to make a critical illness claim?", "expected": "Identifies the critical illness claim form and what it requires."}
+{"question": "What is a politically exposed person and when must I provide that information?", "expected": "Explains the PEP definition and when the identity information is required."}
+{"question": "How do I authorize the disclosure of my personal information?", "expected": "Explains the authorization-to-disclose-personal-information process or form."}
+{"question": "What are my obligations when replacing a life insurance policy?", "expected": "Summarizes the policyholder obligations around policy replacement."}
+{"question": "What does the waiver of premium benefit involve when making a claim?", "expected": "Explains the waiver-of-premium claim."}
+{"question": "What is required to submit a death claim?", "expected": "Describes the death claim claimant's statement and required information."}
+{"question": "What riders are available and what do they cover?", "expected": "Draws from the Rider Guide to describe available riders."}
+{"question": "Do I need a medical exam for the No Medical Life product?", "expected": "Explains the no-medical deferred product terms."}
+{"question": "What is a living benefit claim?", "expected": "Explains the living benefit claim."}
+{"question": "What is the weather in Moncton today?", "expected": "Out of scope. Should refuse: not in the documents."}
+{"question": "Can you recommend a good restaurant near the office?", "expected": "Out of scope. Should refuse: not in the documents."}

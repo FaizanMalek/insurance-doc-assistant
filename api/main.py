@@ -3,7 +3,7 @@ import os, sys, logging
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.rag import answer
+from ragcore.rag import answer
 
 logging.basicConfig(filename="assistant.log", level=logging.INFO,
                     format="%(asctime)s %(message)s")
