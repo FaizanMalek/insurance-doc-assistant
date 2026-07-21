@@ -6,7 +6,7 @@ Run:  python eval/run_eval.py
 import os, sys, json, datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
-from app.rag import answer
+from ragcore.rag import answer
 
 JUDGE = (
     "You are a strict evaluator. Given a QUESTION, the ASSISTANT_ANSWER, its "
